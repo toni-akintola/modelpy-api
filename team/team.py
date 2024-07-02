@@ -85,8 +85,7 @@ modelers: list[Modeler] = [
         name="Kekoa Wong",
         link="https://www.kekoawong.com/",
         models=[
-            ModelInfo(name="zollman-bandit",
-                      link="/models/kekoawong/zollman-bandit"),
+            ModelInfo(name="zollman-bandit", link="/models/kekoawong/zollman-bandit"),
             ModelInfo(
                 name="wu-epistemic-advantage",
                 link="/models/kekoawong/wu-epistemic-advantage",

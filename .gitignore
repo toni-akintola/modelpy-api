@@ -140,6 +140,8 @@ venv.bak/
 # mkdocs documentation
 /site
 
+# Flask Session IDs
+/flask_session
 # mypy
 .mypy_cache/
 .dmypy.json
