@@ -23,7 +23,7 @@ app.config.from_object(__name__)
 
 app.config["SECRET_KEY"] = os.urandom(12)
 app.config["SESSION_TYPE"] = "filesystem"
-
+app.config['SESSION_COOKIE_SECURE'] = False
 # SESSION_REDIS = Redis(host="localhost", port=6379)
 
 Session(app)
