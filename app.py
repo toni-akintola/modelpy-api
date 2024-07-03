@@ -23,7 +23,7 @@ app.config.from_object(__name__)
 
 app.config["SECRET_KEY"] = os.urandom(12)
 app.config["SESSION_TYPE"] = "filesystem"
-app.config['SESSION_COOKIE_SECURE'] = False
+app.config['SESSION_COOKIE_SECURE'] = True
 # SESSION_REDIS = Redis(host="localhost", port=6379)
 
 Session(app)
@@ -81,9 +81,8 @@ def initialize_response():
 # {timesteps: int} -> graphData: {nodeData, edgeData, meanVals}
 @app.post("/timestep")
 def timestep_response():
-
+    data = request.get_json()
     if session.get("model") and session.get("code") and session.get("className"):
-        data = request.get_json()
         try:
             timesteps = data["timesteps"]
         except:
@@ -96,4 +95,4 @@ def timestep_response():
             model = jsonpickle.decode(session["model"], classes=cls)
             data = timestep(model.graph, model, timesteps)
         return data
-    return ""
+    return data
