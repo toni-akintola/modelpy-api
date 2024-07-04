@@ -23,7 +23,11 @@ app.config.from_object(__name__)
 
 app.config["SECRET_KEY"] = os.urandom(12)
 app.config["SESSION_TYPE"] = "filesystem"
-app.config['SESSION_COOKIE_SECURE'] = False
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SECURE'] = True  # Secure since it's in production
+# 'None' for cross-domain requests
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+
 # SESSION_REDIS = Redis(host="localhost", port=6379)
 
 Session(app)
