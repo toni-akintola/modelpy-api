@@ -78,8 +78,7 @@ def initialize_response():
         edge for edge in graph.edges(data=True)
     ]
     print(nodes, edges)
-    graphData = {"nodeData": nodes,
-                 "edgeData": edges, "classParams": classParams}
+    graphData = {"nodeData": nodes, "edgeData": edges, "classParams": classParams}
     session["model"] = jsonpickle.encode(model)
     session["code"] = code
     session["className"] = className

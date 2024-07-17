@@ -7,6 +7,7 @@ import networkx as nx
 import random
 import numpy as np
 import statistics
+import inspect
 
 VisGraphType = Literal["bar", "line", "network"]
 
@@ -162,7 +163,9 @@ def attribs(obj):
     return [
         o
         for o in dir(obj)
-        if not o.startswith("_") and not o in {"timestep", "initialize_graph", "graph"}
+        if not o.startswith("_")
+        and not o in {"timestep", "initialize_graph", "graph"}
+        and not inspect.ismethod(o)
     ]
 
 
