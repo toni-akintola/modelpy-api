@@ -1,3 +1,4 @@
+import jsonpickle.ext.numpy as jsonpickle_numpy
 import os
 from flask import Flask, jsonify, request, session
 
@@ -23,20 +24,22 @@ app.config.from_object(__name__)
 
 app.config["SECRET_KEY"] = os.urandom(12)
 app.config["SESSION_TYPE"] = "filesystem"
-app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['SESSION_COOKIE_SECURE'] = True  # Secure since it's in production
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SECURE"] = True  # Secure since it's in production
 # 'None' for cross-domain requests
-app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config["SESSION_COOKIE_SAMESITE"] = "None"
+
 
 # SESSION_REDIS = Redis(host="localhost", port=6379)
 
 Session(app)
 CORS(app, supports_credentials=True)
+jsonpickle_numpy.register_handlers()
+
 
 @app.route("/")
 def hello_world():
     return "Hello, World!"
-
 
 
 # {username: str, repo: str, repoData: bool} -> <- graphData: {nodeData, edgeData, classParams}
@@ -48,7 +51,7 @@ def initialize_response():
         data["username"],
         data["repo"],
         data["repoData"],
-        data["code"]
+        data["code"],
     )
 
     if repoData:
@@ -75,7 +78,8 @@ def initialize_response():
         edge for edge in graph.edges(data=True)
     ]
     print(nodes, edges)
-    graphData = {"nodeData": nodes, "edgeData": edges, "classParams": classParams}
+    graphData = {"nodeData": nodes,
+                 "edgeData": edges, "classParams": classParams}
     session["model"] = jsonpickle.encode(model)
     session["code"] = code
     session["className"] = className
