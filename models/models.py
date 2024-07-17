@@ -164,8 +164,8 @@ def attribs(obj):
         o
         for o in dir(obj)
         if not o.startswith("_")
-        and not o in {"timestep", "initialize_graph", "graph"}
         and not inspect.ismethod(o)
+        and not o in {"timestep", "initialize_graph", "graph"}
     ]
 
 
