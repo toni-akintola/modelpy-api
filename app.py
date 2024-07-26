@@ -67,8 +67,17 @@ def initialize_response():
     exec(code)
     model = eval("constructModel()")
     params = attribs(model)
+
     if model_parameters:
+        for param in model_parameters:
+            try:
+                model_parameters[param] = float(model_parameters[param])
+            except:
+                print(f"Failed to convert {param}")
+                continue
+        print(model_parameters)
         model.update_parameters(model_parameters)
+        model["num_nodes"] = int(model["num_nodes"])
     model_parameters = {
         parameter: model[parameter] for parameter in model.list_parameters()
     }
