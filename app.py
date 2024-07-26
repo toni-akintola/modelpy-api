@@ -18,6 +18,7 @@ from flask_session import Session
 from flask_cors import CORS
 
 from models.models import attribs, getGitHub, timestep
+from modelpy_abm.main import AgentModel
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -28,7 +29,6 @@ app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SECURE"] = True  # Secure since it's in production
 # 'None' for cross-domain requests
 app.config["SESSION_COOKIE_SAMESITE"] = "None"
-
 
 # SESSION_REDIS = Redis(host="localhost", port=6379)
 
@@ -47,41 +47,47 @@ def hello_world():
 def initialize_response():
     data = request.get_json()
 
-    username, repo, repoData, code = (
+    username, repo, repoData, model_parameters = (
         data["username"],
         data["repo"],
         data["repoData"],
-        data["code"],
+        data["parameters"],
     )
 
     if repoData:
         return jsonify(getGitHub(username, repo, repoData))
+    else:
+        github_url = (
+            f"https://raw.githubusercontent.com/{username}/{repo}/main/model.py"
+        )
 
-    p = ast.parse(code)
-    className = None
-    classParams = []
-    for node in ast.walk(p):
-        if isinstance(node, ast.ClassDef):
-            className = node.name
-            break
+        response = requests.get(github_url)
+        code = response.text
 
-    add_on_code = f"""new_model = {className}()"""
-    code = code + add_on_code
     print(code)
     exec(code)
-    model = eval("new_model")
+    model = eval("constructModel()")
     params = attribs(model)
-    classParams = {param: getattr(model, param) for param in params}
+    if model_parameters:
+        model.update(model_parameters)
+    model_parameters = {
+        parameter: model[parameter] for parameter in model.list_parameters()
+    }
     model.initialize_graph()
-    graph = model.graph
+    graph = model.get_graph()
     nodes, edges = [node for node in graph.nodes(data=True)], [
         edge for edge in graph.edges(data=True)
     ]
-    print(nodes, edges, classParams)
-    graphData = {"nodeData": nodes, "edgeData": edges, "classParams": classParams}
+
+    graphData = {
+        "nodeData": nodes,
+        "edgeData": edges,
+        "classParams": model.list_parameters(),
+        "parameters": model_parameters,
+    }
     session["model"] = jsonpickle.encode(model)
+    session["parameters"] = model.list_parameters()
     session["code"] = code
-    session["className"] = className
     return graphData
 
 
@@ -102,4 +108,5 @@ def timestep_response():
             model = jsonpickle.decode(session["model"], classes=cls)
             data = timestep(model.graph, model, timesteps)
         return data
+    print("Couldn't find model")
     return data

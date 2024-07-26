@@ -165,7 +165,22 @@ def attribs(obj):
         for o in dir(obj)
         if not o.startswith("_")
         and not inspect.ismethod(o)
-        and not o in {"timestep", "initialize_graph", "graph"}
+        and not o
+        in {
+            "delete_parameters",
+            "get_graph",
+            "initial_data_function",
+            "is_converged",
+            "list_parameters",
+            "run_to_convergence",
+            "set_graph",
+            "set_initial_data_function",
+            "set_timestep_function",
+            "timestep_function",
+            "update_parameters",
+            "initialize_graph",
+            "timestep",
+        }
     ]
 
 
@@ -177,59 +192,4 @@ def getGitHub(username: str, repo: str):
     response = requests.get(github_url)
     data = response.json()
 
-    return data
-
-
-def initialize_graph(code: str):
-    p = ast.parse(code)
-    className = None
-    classParams = []
-    for node in ast.walk(p):
-        if isinstance(node, ast.ClassDef):
-            className = node.name
-            break
-
-    add_on_code = f"""new_model = {className}()"""
-    code = code + add_on_code
-
-    exec(code)
-    model = eval("new_model")
-    params = attribs(model)
-    classParams = {param: getattr(model, param) for param in params}
-    model.initialize_graph()
-    graph = model.graph
-    nodes, edges = [node for node in graph.nodes(data=True)], [
-        edge for edge in graph.edges(data=True)
-    ]
-    print(nodes, edges)
-    data = {"nodeData": nodes, "edgeData": edges, "classParams": classParams}
-    return data, jsonpickle.encode(model), className
-
-
-def timestep(graph, model, timesteps: int):
-    mean_vals = []
-
-    # Get all keys that have numerical values in the graph
-    numerical_keys = {
-        key
-        for node, data in graph.nodes(data=True)
-        for key in data
-        if isinstance(data[key], (int, float, complex))
-    }
-    for _ in range(timesteps):
-        updated_graph = model.timestep()
-        timestep_means = {}
-        for key in numerical_keys:
-            values = [
-                data[key]
-                for node, data in updated_graph.nodes(data=True)
-                if key in data and data[key] is not None
-            ]
-            new_mean = statistics.mean(values) if values else 0
-            timestep_means[key] = new_mean
-        mean_vals.append(timestep_means)
-    nodes, edges = [node for node in graph.nodes(data=True)], [
-        edge for edge in graph.edges(data=True)
-    ]
-    data = {"nodeData": nodes, "edgeData": edges, "meanVals": mean_vals}
     return data
