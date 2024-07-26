@@ -22,6 +22,7 @@ keyring==25.2.1
 markdown-it-py==3.0.0
 MarkupSafe==2.1.5
 mdurl==0.1.2
+modelpy-abm==0.0.3
 more-itertools==10.3.0
 msgspec==0.18.6
 networkx==3.3
