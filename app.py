@@ -68,7 +68,7 @@ def initialize_response():
     model = eval("constructModel()")
     params = attribs(model)
     if model_parameters:
-        model.update(model_parameters)
+        model.update_parameters(model_parameters)
     model_parameters = {
         parameter: model[parameter] for parameter in model.list_parameters()
     }
