@@ -8,6 +8,7 @@ import random
 import numpy as np
 import statistics
 import inspect
+from modelpy_abm.main import AgentModel
 
 VisGraphType = Literal["bar", "line", "network"]
 
@@ -192,4 +193,34 @@ def getGitHub(username: str, repo: str):
     response = requests.get(github_url)
     data = response.json()
 
+    return data
+
+
+def timestep(graph, model: AgentModel, timesteps: int):
+    mean_vals = []
+
+    # Get all keys that have numerical values in the graph
+    numerical_keys = {
+        key
+        for node, data in graph.nodes(data=True)
+        for key in data
+        if isinstance(data[key], (int, float, complex))
+    }
+    for _ in range(timesteps):
+        model.timestep()
+        updated_graph = model.get_graph()
+        timestep_means = {}
+        for key in numerical_keys:
+            values = [
+                data[key]
+                for node, data in updated_graph.nodes(data=True)
+                if key in data and data[key] is not None
+            ]
+            new_mean = statistics.mean(values) if values else 0
+            timestep_means[key] = new_mean
+        mean_vals.append(timestep_means)
+    nodes, edges = [node for node in graph.nodes(data=True)], [
+        edge for edge in graph.edges(data=True)
+    ]
+    data = {"nodeData": nodes, "edgeData": edges, "meanVals": mean_vals}
     return data

@@ -3,8 +3,7 @@ import os
 from flask import Flask, jsonify, request, session
 
 import jsonpickle
-from typing import Literal
-import random
+
 
 from redis import Redis
 import networkx as nx
@@ -106,7 +105,7 @@ def timestep_response():
             exec(code)
             cls = eval(className)
             model = jsonpickle.decode(session["model"], classes=cls)
-            data = timestep(model.graph, model, timesteps)
+            data = timestep(model.get_graph(), model, timesteps)
         return data
     print("Couldn't find model")
     return data
