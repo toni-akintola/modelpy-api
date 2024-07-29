@@ -119,7 +119,7 @@ def timestep_response():
         except:
             return data
         else:
-            model = session["model"]
+            model = jsonpickle.decode(session["model"])
             code = session["code"]
             namespace = {}
             exec(code, namespace)
