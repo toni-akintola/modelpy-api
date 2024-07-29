@@ -56,16 +56,17 @@ def initialize_response():
     if repoData:
         return jsonify(getGitHub(username, repo, repoData))
     else:
-        github_url = (
-            f"https://raw.githubusercontent.com/{username}/{repo}/main/model.py"
-        )
+        github_url = f"https://raw.githubusercontent.com/{
+                username}/{repo}/main/model.py"
 
         response = requests.get(github_url)
         code = response.text
 
-    print(code)
-    exec(code)
-    model = eval("constructModel()")
+    namespace = {}
+    exec(code, namespace)
+    print("Namespace contents:", namespace)
+    model = namespace["constructModel"]()
+
     params = attribs(model)
 
     if model_parameters:
@@ -75,7 +76,6 @@ def initialize_response():
             except:
                 print(f"Failed to convert {param}")
                 continue
-        print(model_parameters)
         model.update_parameters(model_parameters)
         model["num_nodes"] = int(model["num_nodes"])
     model_parameters = {
@@ -94,6 +94,15 @@ def initialize_response():
         "parameters": model_parameters,
     }
     session["model"] = jsonpickle.encode(model)
+    session["generateInitialData"] = jsonpickle.encode(namespace["generateInitialData"])
+    session["generateTimestepData"] = jsonpickle.encode(
+        namespace["generateTimestepData"]
+    )
+    f = open("model.txt", "a")
+    f.write(session["generateInitialData"])
+    f.write("\n")
+    f.write(session["generateTimestepData"])
+    f.close()
     session["parameters"] = model.list_parameters()
     session["code"] = code
     return graphData
@@ -102,6 +111,7 @@ def initialize_response():
 # {timesteps: int} -> graphData: {nodeData, edgeData, meanVals}
 @app.post("/timestep")
 def timestep_response():
+
     data = request.get_json()
     if session.get("model") and session.get("code"):
         try:
@@ -109,9 +119,13 @@ def timestep_response():
         except:
             return data
         else:
+            model = session["model"]
             code = session["code"]
-            exec(code)
-            model = jsonpickle.decode(session["model"])
+            namespace = {}
+            exec(code, namespace)
+            model.set_initial_data_function(namespace["generateInitialData"])
+            model.set_timestep_function(namespace["generateTimestepData"])
+            print(model.timestep_function)
             data = timestep(model.get_graph(), model, timesteps)
         return data
     print(session.items())
