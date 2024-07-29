@@ -110,10 +110,8 @@ def timestep_response():
             return data
         else:
             code = session["code"]
-            className = session["className"]
             exec(code)
-            cls = eval(className)
-            model = jsonpickle.decode(session["model"], classes=cls)
+            model = jsonpickle.decode(session["model"])
             data = timestep(model.get_graph(), model, timesteps)
         return data
     print("Couldn't find model")
