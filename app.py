@@ -114,5 +114,6 @@ def timestep_response():
             model = jsonpickle.decode(session["model"])
             data = timestep(model.get_graph(), model, timesteps)
         return data
+    print(session.items())
     print("Couldn't find model")
     return data
