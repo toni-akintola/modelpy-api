@@ -103,7 +103,7 @@ def initialize_response():
 @app.post("/timestep")
 def timestep_response():
     data = request.get_json()
-    if session.get("model") and session.get("code") and session.get("className"):
+    if session.get("model") and session.get("code"):
         try:
             timesteps = data["timesteps"]
         except:
