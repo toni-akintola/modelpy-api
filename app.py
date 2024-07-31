@@ -29,7 +29,6 @@ app.config["SESSION_COOKIE_SECURE"] = True  # Secure since it's in production
 # 'None' for cross-domain requests
 app.config["SESSION_COOKIE_SAMESITE"] = "None"
 
-# SESSION_REDIS = Redis(host="localhost", port=6379)
 
 Session(app)
 CORS(app, supports_credentials=True)
