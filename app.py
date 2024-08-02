@@ -29,7 +29,6 @@ app.config["SESSION_COOKIE_SECURE"] = True  # Secure since it's in production
 # 'None' for cross-domain requests
 app.config["SESSION_COOKIE_SAMESITE"] = "None"
 
-# SESSION_REDIS = Redis(host="localhost", port=6379)
 
 Session(app)
 CORS(app, supports_credentials=True)
@@ -98,14 +97,32 @@ def initialize_response():
     session["generateTimestepData"] = jsonpickle.encode(
         namespace["generateTimestepData"]
     )
-    f = open("model.txt", "a")
-    f.write(session["generateInitialData"])
-    f.write("\n")
-    f.write(session["generateTimestepData"])
-    f.close()
     session["parameters"] = model.list_parameters()
     session["code"] = code
     return graphData
+
+
+@app.post("/get-initial-params")
+def get_initial_params_response():
+    data = request.get_json()
+
+    username, repo = data["username"], data["repo"]
+
+    github_url = f"https://raw.githubusercontent.com/{
+        username}/{repo}/main/model.py"
+
+    response = requests.get(github_url)
+    code = response.text
+
+    namespace = {}
+    exec(code, namespace)
+
+    model = namespace["constructModel"]()
+    model_parameters = {
+        parameter: model[parameter] for parameter in model.list_parameters()
+    }
+
+    return {"parameters": model_parameters}
 
 
 # {timesteps: int} -> graphData: {nodeData, edgeData, meanVals}
