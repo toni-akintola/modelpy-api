@@ -62,6 +62,7 @@ def initialize_response():
         code = response.text
 
     namespace = {}
+
     exec(code, namespace)
     print("Namespace contents:", namespace)
     model = namespace["constructModel"]()
@@ -93,6 +94,7 @@ def initialize_response():
         "parameters": model_parameters,
     }
     session["model"] = jsonpickle.encode(model)
+    print(session["model"])
     session["generateInitialData"] = jsonpickle.encode(namespace["generateInitialData"])
     session["generateTimestepData"] = jsonpickle.encode(
         namespace["generateTimestepData"]
@@ -121,6 +123,13 @@ def get_initial_params_response():
     model_parameters = {
         parameter: model[parameter] for parameter in model.list_parameters()
     }
+    session["model"] = jsonpickle.encode(model)
+    session["generateInitialData"] = jsonpickle.encode(namespace["generateInitialData"])
+    session["generateTimestepData"] = jsonpickle.encode(
+        namespace["generateTimestepData"]
+    )
+    session["parameters"] = model.list_parameters()
+    session["code"] = code
 
     return {"parameters": model_parameters}
 
@@ -133,6 +142,9 @@ def timestep_response():
     if session.get("model") and session.get("code"):
         try:
             timesteps = data["timesteps"]
+            run_to_convergence = (
+                data["convergence"] if data.get("convergence") else False
+            )
         except:
             return data
         else:
@@ -142,8 +154,12 @@ def timestep_response():
             exec(code, namespace)
             model.set_initial_data_function(namespace["generateInitialData"])
             model.set_timestep_function(namespace["generateTimestepData"])
-            print(model.timestep_function)
-            data = timestep(model.get_graph(), model, timesteps)
+            data = timestep(
+                model.get_graph(),
+                model,
+                timesteps,
+                run_to_convergence=run_to_convergence,
+            )
         return data
     print(session.items())
     print("Couldn't find model")
