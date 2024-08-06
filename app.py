@@ -124,6 +124,9 @@ def get_initial_params_response():
         parameter: model[parameter] for parameter in model.list_parameters()
     }
     session["model"] = jsonpickle.encode(model)
+    model.initialize_graph()
+    graph: nx.Graph = model.get_graph()
+    datakeys = list(graph.nodes[0].keys())
     session["generateInitialData"] = jsonpickle.encode(namespace["generateInitialData"])
     session["generateTimestepData"] = jsonpickle.encode(
         namespace["generateTimestepData"]
@@ -131,7 +134,7 @@ def get_initial_params_response():
     session["parameters"] = model.list_parameters()
     session["code"] = code
 
-    return {"parameters": model_parameters}
+    return {"parameters": model_parameters, "datakeys": datakeys}
 
 
 # {timesteps: int} -> graphData: {nodeData, edgeData, meanVals}
