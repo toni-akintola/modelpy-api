@@ -8,7 +8,7 @@ import random
 import numpy as np
 import statistics
 import inspect
-from modelpy_abm.main import AgentModel
+from modelpy_abm.main import AgentModel, MAX_TIMESTEPS
 
 VisGraphType = Literal["bar", "line", "network"]
 
@@ -196,7 +196,7 @@ def getGitHub(username: str, repo: str):
     return data
 
 
-def timestep(graph, model: AgentModel, timesteps: int):
+def timestep(graph, model: AgentModel, timesteps: int, run_to_convergence=False):
     mean_vals = []
 
     # Get all keys that have numerical values in the graph
@@ -206,19 +206,40 @@ def timestep(graph, model: AgentModel, timesteps: int):
         for key in data
         if isinstance(data[key], (int, float, complex))
     }
-    for _ in range(timesteps):
-        model.timestep()
-        updated_graph = model.get_graph()
-        timestep_means = {}
-        for key in numerical_keys:
-            values = [
-                data[key]
-                for node, data in updated_graph.nodes(data=True)
-                if key in data and data[key] is not None
-            ]
-            new_mean = statistics.mean(values) if values else 0
-            timestep_means[key] = new_mean
-        mean_vals.append(timestep_means)
+    if run_to_convergence:
+        t = 0
+        while t < MAX_TIMESTEPS and not model.is_converged(
+            data_key=model["convergence_data_key"], std_dev=model["convergence_std_dev"]
+        ):
+            model.timestep()
+            updated_graph = model.get_graph()
+            timestep_means = {}
+            for key in numerical_keys:
+                values = [
+                    data[key]
+                    for node, data in updated_graph.nodes(data=True)
+                    if key in data and data[key] is not None
+                ]
+                new_mean = statistics.mean(values) if values else 0
+                timestep_means[key] = new_mean
+            mean_vals.append(timestep_means)
+            t += 1
+        print(t)
+
+    else:
+        for _ in range(timesteps):
+            model.timestep()
+            updated_graph = model.get_graph()
+            timestep_means = {}
+            for key in numerical_keys:
+                values = [
+                    data[key]
+                    for node, data in updated_graph.nodes(data=True)
+                    if key in data and data[key] is not None
+                ]
+                new_mean = statistics.mean(values) if values else 0
+                timestep_means[key] = new_mean
+            mean_vals.append(timestep_means)
     nodes, edges = [node for node in graph.nodes(data=True)], [
         edge for edge in graph.edges(data=True)
     ]
