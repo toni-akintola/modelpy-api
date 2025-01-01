@@ -8,7 +8,7 @@ import random
 import numpy as np
 import statistics
 import inspect
-from modelpy_abm.main import AgentModel, MAX_TIMESTEPS
+from emergent import AgentModel, MAX_TIMESTEPS
 
 VisGraphType = Literal["bar", "line", "network"]
 
