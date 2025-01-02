@@ -17,7 +17,7 @@ from flask_session import Session
 from flask_cors import CORS
 
 from models.models import attribs, getGitHub, timestep
-from emergent import AgentModel
+from emergent.main import AgentModel
 
 app = Flask(__name__)
 app.config.from_object(__name__)

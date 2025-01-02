@@ -24,7 +24,6 @@ MarkupSafe==2.1.5
 mdurl==0.1.2
 emergent==0.0.6
 more-itertools==10.3.0
-msgspec==0.18.6
 networkx==3.3
 nh3==0.2.18
 numpy==2.0.0

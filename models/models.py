@@ -8,7 +8,7 @@ import random
 import numpy as np
 import statistics
 import inspect
-from emergent import AgentModel, MAX_TIMESTEPS
+from emergent.main import AgentModel
 
 VisGraphType = Literal["bar", "line", "network"]
 
@@ -223,7 +223,7 @@ def timestep(graph, model: AgentModel, timesteps: int, run_to_convergence=False)
 
     if run_to_convergence:
         t = 0
-        while t < MAX_TIMESTEPS and not model.is_converged(
+        while t < model["MAX_TIMESTEPS"] and not model.is_converged(
             data_key=model["convergence_data_key"], std_dev=model["convergence_std_dev"]
         ):
             model.timestep()
