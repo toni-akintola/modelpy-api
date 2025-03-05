@@ -8,10 +8,10 @@ import jsonpickle
 from redis import Redis
 import networkx as nx
 import random
-
 import numpy as np
 import statistics
 import ast
+import scipy
 import requests
 from flask_session import Session
 from flask_cors import CORS
