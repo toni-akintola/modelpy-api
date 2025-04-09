@@ -127,7 +127,7 @@ def get_initial_params_response():
     model.initialize_graph()
     graph: nx.Graph = model.get_graph()
     datakeys = list(graph.nodes[0].keys())
-    model_variations = model["variations"]
+    model_variations = model_parameters.get("variations", [])
     session["generateInitialData"] = jsonpickle.encode(namespace["generateInitialData"])
     session["generateTimestepData"] = jsonpickle.encode(
         namespace["generateTimestepData"]
