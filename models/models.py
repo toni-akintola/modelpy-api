@@ -239,8 +239,9 @@ def timestep(graph, model: AgentModel, timesteps: int, run_to_convergence=False)
                 timestep_means[key] = new_mean
             mean_vals.append(timestep_means)
             t += 1
-    nodes, edges = [node for node in graph.nodes(data=True)], [
-        edge for edge in graph.edges(data=True)
+    final_graph = model.get_graph()
+    nodes, edges = [node for node in final_graph.nodes(data=True)], [
+        edge for edge in final_graph.edges(data=True)
     ]
     data = {"nodeData": nodes, "edgeData": edges, "meanVals": mean_vals}
     return data
