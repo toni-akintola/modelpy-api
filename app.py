@@ -94,7 +94,6 @@ def initialize_response():
         "parameters": model_parameters,
     }
     session["model"] = jsonpickle.encode(model)
-    print(session["model"])
     session["generateInitialData"] = jsonpickle.encode(namespace["generateInitialData"])
     session["generateTimestepData"] = jsonpickle.encode(
         namespace["generateTimestepData"]
