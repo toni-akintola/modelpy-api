@@ -164,6 +164,8 @@ def timestep_response():
                 timesteps,
                 run_to_convergence=run_to_convergence,
             )
+            session["model"] = jsonpickle.encode(model)
+            session["code"] = code
         return data
     print(session.items())
     print("Couldn't find model")
