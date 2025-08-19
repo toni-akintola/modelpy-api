@@ -64,18 +64,19 @@ def initialize_response():
     namespace = {}
 
     exec(code, namespace)
-    print("Namespace contents:", namespace)
     model = namespace["constructModel"]()
 
     params = attribs(model)
+    NOT_TO_CONVERT = {"variations", "model_variation"}
 
     if model_parameters:
         for param in model_parameters:
-            try:
-                model_parameters[param] = float(model_parameters[param])
-            except:
-                print(f"Failed to convert {param}")
-                continue
+            if param not in NOT_TO_CONVERT:
+                try:
+                    model_parameters[param] = float(model_parameters[param])
+                except:
+                    print(f"Failed to convert {param}")
+                    continue
         model.update_parameters(model_parameters)
         model["num_nodes"] = int(model["num_nodes"])
     model_parameters = {
@@ -100,6 +101,7 @@ def initialize_response():
     )
     session["parameters"] = model.list_parameters()
     session["code"] = code
+    print(graphData)
     return graphData
 
 
@@ -111,6 +113,7 @@ def get_initial_params_response():
 
     github_url = f"https://raw.githubusercontent.com/{
         username}/{repo}/main/model.py"
+
 
     response = requests.get(github_url)
     code = response.text
@@ -165,6 +168,7 @@ def timestep_response():
             )
             session["model"] = jsonpickle.encode(model)
             session["code"] = code
+        print(data)
         return data
     print(session.items())
     print("Couldn't find model")
