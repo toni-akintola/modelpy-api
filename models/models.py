@@ -115,20 +115,7 @@ models: list[Model] = [
                 type="bar",
             ),
         ],
-    ),
-    # Model(
-    #     id="toni-akintola-boltzmann-wealth-model",
-    #     username="toni-akintola",
-    #     repo="huang-trackrecords",
-    #     categories=["bandit", "abm"],
-    #     visualizations=[
-    #         Vis(
-    #             title="Wealth of each node at timestep t",
-    #             dataKey="true_bias",
-    #             type="bar",
-    #         ),
-    #     ],
-    # ),
+    )
 ]
 
 
