@@ -122,6 +122,7 @@ def get_initial_params_response():
     exec(code, namespace)
 
     model = namespace["constructModel"]()
+    print(AgentModel)
     model_parameters = {
         parameter: model[parameter] for parameter in model.list_parameters()
     }
@@ -129,7 +130,7 @@ def get_initial_params_response():
     model.initialize_graph()
     graph: nx.Graph = model.get_graph()
     datakeys = list(graph.nodes[0].keys())
-    print(datakeys)
+    print(model_parameters)
     model_variations = model_parameters.get("variations", [])
     session["generateInitialData"] = jsonpickle.encode(namespace["generateInitialData"])
     session["generateTimestepData"] = jsonpickle.encode(
