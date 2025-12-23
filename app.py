@@ -122,7 +122,6 @@ def get_initial_params_response():
     exec(code, namespace)
 
     model = namespace["constructModel"]()
-    print(AgentModel)
     model_parameters = {
         parameter: model[parameter] for parameter in model.list_parameters()
     }

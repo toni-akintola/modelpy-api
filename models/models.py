@@ -208,24 +208,6 @@ def timestep(graph, model: AgentModel, timesteps: int, run_to_convergence=False)
             timestep_means[key] = new_mean
         mean_vals.append(timestep_means)
 
-    if run_to_convergence:
-        t = 0
-        while t < model["MAX_TIMESTEPS"] and not model.is_converged(
-            data_key=model["convergence_data_key"], std_dev=model["convergence_std_dev"]
-        ):
-            model.timestep()
-            updated_graph = model.get_graph()
-            timestep_means = {}
-            for key in numerical_keys:
-                values = [
-                    data[key]
-                    for node, data in updated_graph.nodes(data=True)
-                    if key in data and data[key] is not None
-                ]
-                new_mean = statistics.mean(values) if values else 0
-                timestep_means[key] = new_mean
-            mean_vals.append(timestep_means)
-            t += 1
     final_graph = model.get_graph()
     nodes, edges = [node for node in final_graph.nodes(data=True)], [
         edge for edge in final_graph.edges(data=True)
